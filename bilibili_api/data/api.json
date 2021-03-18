@@ -19,6 +19,15 @@
         },
         "comment": "视频详细信息"
       },
+      "info_member": {
+        "url": "https://member.bilibili.com/x/web/archive/view",
+        "method": "GET",
+        "verify": true,
+        "params": {
+          "aid": "av号"
+        },
+        "comment": "视频发布信息"
+      },
       "tags": {
         "url": "https://api.bilibili.com/x/tag/archive/tags",
         "method": "GET",

@@ -28,12 +28,14 @@ import struct
 API = utils.get_api()
 
 
-def get_video_info(bvid: str = None, aid: int = None, is_simple: bool = False, verify: utils.Verify = None):
+def get_video_info(bvid: str = None, aid: int = None, is_simple: bool = False,
+                   is_member: bool = False, verify: utils.Verify = None):
     """
     获取视频信息
     :param aid:
     :param bvid:
     :param is_simple: 简易信息（另一个API）
+    :param is_member: 发布信息（另一个API，需要登录）
     :param verify:
     :return:
     """
@@ -44,8 +46,11 @@ def get_video_info(bvid: str = None, aid: int = None, is_simple: bool = False, v
 
     if is_simple:
         api = API["video"]["info"]["info_simple"]
+    elif is_member:
+        api = API["video"]["info"]["info_member"]
     else:
         api = API["video"]["info"]["info_detail"]
+
     params = {
         "aid": aid,
         "bvid": bvid
@@ -1343,6 +1348,49 @@ def video_submit(data: dict, verify: utils.Verify):
     :return:
     """
     url = "https://member.bilibili.com/x/vu/web/add"
+    params = {
+        "csrf": verify.csrf
+    }
+    payload = json.dumps(data, ensure_ascii=False).encode()
+    resp = utils.post(url, params=params, data=payload, data_type="json", cookies=verify.get_cookies())
+    return resp
+
+
+def video_update(data: dict, verify: utils.Verify):
+    """
+    修改投稿信息
+    :param data: 投稿信息
+    {
+        "bvid": 原视频 bv号,
+        "aid": 原视频 av号,
+        "copyright": 1自制2转载,
+        "source": "类型为转载时注明来源",
+        "cover": "封面URL",
+        "desc": "简介",
+        "desc_format_id": 0,
+        "dynamic": "动态信息",
+        "interactive": 0,
+        "no_reprint": 1为显示禁止转载,
+        "subtitles": {
+            // 字幕格式，请自行研究
+            "lan": "语言",
+            "open": 0
+        },
+        "tag": "标签1,标签2,标签3（英文半角逗号分隔）",
+        "tid": 分区ID,
+        "title": "标题",
+        "videos": [
+            {
+                "desc": "描述",
+                "filename": "video_upload(返回值)",
+                "title": "分P标题"
+            }
+        ]
+    }
+    :param verify:
+    :return:
+    """
+    url = "https://member.bilibili.com/x/vu/web/edit"
     params = {
         "csrf": verify.csrf
     }
