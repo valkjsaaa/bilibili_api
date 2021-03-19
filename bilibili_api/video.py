@@ -1167,7 +1167,8 @@ def video_upload(path: str, verify: utils.Verify, on_progress=None):
         'name': os.path.basename(path),
         'size': total_size,
         'r': 'upos',
-        'profile': 'ugcupos/bup'
+        'profile': 'ugcupos/bup',
+        'upcdn': 'ws'
     }
     try:
         resp = session.get('https://member.bilibili.com/preupload', params=params)
@@ -1238,7 +1239,8 @@ def video_upload(path: str, verify: utils.Verify, on_progress=None):
         for i in range(settings['threads']):
             this_task_chunks = chunks_settings[i*chunks_per_thread:(i+1)*chunks_per_thread]
             task_chunks.append(this_task_chunks)
-        task_chunks[-1] += (chunks_settings[-remain:])
+        if remain != 0:
+            task_chunks[-1] += (chunks_settings[-remain:])
 
         async with aiohttp.ClientSession(
                 headers={'X-Upos-Auth': settings['auth']},
