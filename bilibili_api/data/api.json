@@ -273,6 +273,21 @@
           "platform": "web_player"
         },
         "comment": "点赞弹幕"
+      },
+      "save_subtitle": {
+        "url": "https://api.bilibili.com/x/v2/dm/subtitle/draft/save",
+        "method": "POST",
+        "verify": true,
+        "data": {
+          "type": "操作方式",
+          "oid": "分P编号",
+          "lan": "语言",
+          "submit": "提交，一般 true",
+          "sign": "签名，一般 false",
+          "data": "bcc 字母数据",
+          "bvid": "bvid"
+        },
+        "comment": "点赞弹幕"
       }
     }
   },

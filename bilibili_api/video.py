@@ -936,6 +936,50 @@ def send_danmaku(danmaku: utils.Danmaku, page: int = 0, bvid: str = None, aid: i
     return resp
 
 
+def save_subtitle(
+        bcc_subtitle: str,
+        sign: bool = False,
+        page: int = 0,
+        bvid: str = None,
+        aid: int = None,
+        verify: utils.Verify = None
+):
+    """
+    上传字幕
+    :param bcc_subtitle: bcc 格式的 subtitle
+    :param sign: 是否签名
+    :param page: 分p号
+    :param aid:
+    :param bvid:
+    :param verify:
+    :return:
+    """
+    if not (aid or bvid):
+        raise exceptions.NoIdException
+    if verify is None:
+        verify = utils.Verify()
+    if not verify.has_sess():
+        raise exceptions.NoPermissionException(utils.MESSAGES["no_sess"])
+    if not verify.has_csrf():
+        raise exceptions.NoPermissionException(utils.MESSAGES["no_csrf"])
+
+    page_info = get_pages(bvid, aid, verify)
+    oid = page_info[page]["cid"]
+    api = API["video"]["danmaku"]["save_subtitle"]
+    data = {
+        "type": 1,
+        "oid": oid,
+        "lan": "zh-CN",
+        "submit": True,
+        "sign": sign,
+        "bvid": bvid,
+        "aid": aid,
+        "csrf": verify.csrf,
+        "data": bcc_subtitle
+    }
+    resp = utils.post(url=api["url"], data=data, cookies=verify.get_cookies())
+    return resp
+
 # 评论相关
 
 
