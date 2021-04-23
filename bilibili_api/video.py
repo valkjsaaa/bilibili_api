@@ -942,6 +942,7 @@ def save_subtitle(
         page: int = 0,
         bvid: str = None,
         aid: int = None,
+        cid: int = None,
         verify: utils.Verify = None
 ):
     """
@@ -951,6 +952,7 @@ def save_subtitle(
     :param page: 分p号
     :param aid:
     :param bvid:
+    :param cid: cid 如果提供，将忽略分p号
     :param verify:
     :return:
     """
@@ -963,8 +965,11 @@ def save_subtitle(
     if not verify.has_csrf():
         raise exceptions.NoPermissionException(utils.MESSAGES["no_csrf"])
 
-    page_info = get_pages(bvid, aid, verify)
-    oid = page_info[page]["cid"]
+    if cid is None:
+        page_info = get_pages(bvid, aid, verify)
+        oid = page_info[page]["cid"]
+    else:
+        oid = cid
     api = API["video"]["danmaku"]["save_subtitle"]
     data = {
         "type": 1,
