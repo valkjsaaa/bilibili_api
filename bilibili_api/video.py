@@ -1370,6 +1370,89 @@ def video_cover_upload(path, verify: utils.Verify):
     return cover_url
 
 
+def post_with_app(
+        url: str,
+        get_method: bool,
+        verify: utils.Verify,
+        access_key: str,
+        **kwargs
+):
+    mobi_app: str = "android"
+    platform: str = "android"
+    height: int = 1920
+    width: int = 1080
+    ts: int = int(time.time())
+    appkey: str = "1d8b6e7d45233436"
+    appsec: str = "560c52ccd288fed045859ed18bffd973"
+
+    sign_params = "appkey=" + appkey + "&mobi_app=" + mobi_app + "&platform=" + platform + "&screen_height=" + str(
+        height) + "&screen_width=" + str(width) + "&ts=" + str(ts) + appsec
+    from sys import version_info
+    if version_info.major == 2:
+        import md5
+        singing = md5.new()
+        singing.update(sign_params.encode(encoding='utf-8'))
+        sign = singing.hexdigest()
+    else:
+        import hashlib
+        singing = hashlib.md5()
+        singing.update(sign_params.encode(encoding='utf-8'))
+        sign = singing.hexdigest()
+    params = {
+        "access_key": access_key,
+        "appkey": appkey,
+        "mobi_app": mobi_app,
+        "platform": platform,
+        "screen_height": height,
+        "screen_width": width,
+        "ts": ts,
+        "sign": sign
+    }
+    if get_method:
+        resp = utils.get(url=url, params=params, cookies=verify.get_cookies(), **kwargs)
+    else:
+        resp = utils.post(url=url, params=params, cookies=verify.get_cookies(), **kwargs)
+    return resp
+
+
+def video_submit_app(data: dict, verify: utils.Verify, access_key: str):
+    """
+    提交投稿信息
+    :param data: 投稿信息
+    {
+        "copyright": 1自制2转载,
+        "source": "类型为转载时注明来源",
+        "cover": "封面URL",
+        "desc": "简介",
+        "desc_format_id": 0,
+        "dynamic": "动态信息",
+        "interactive": 0,
+        "no_reprint": 1为显示禁止转载,
+        "subtitles": {
+            // 字幕格式，请自行研究
+            "lan": "语言",
+            "open": 0
+        },
+        "tag": "标签1,标签2,标签3（英文半角逗号分隔）",
+        "tid": 分区ID,
+        "title": "标题",
+        "videos": [
+            {
+                "desc": "描述",
+                "filename": "video_upload(返回值)",
+                "title": "分P标题"
+            }
+        ]
+    }
+    :param verify:
+    :return:
+    """
+    url = "https://member.bilibili.com/x/vu/app/add"
+    payload = json.dumps(data, ensure_ascii=False).encode()
+    resp = post_with_app(url, get_method=False, data=payload, data_type="json", verify=verify, access_key=access_key)
+    return resp
+
+
 def video_submit(data: dict, verify: utils.Verify):
     """
     提交投稿信息
@@ -1408,6 +1491,44 @@ def video_submit(data: dict, verify: utils.Verify):
     }
     payload = json.dumps(data, ensure_ascii=False).encode()
     resp = utils.post(url, params=params, data=payload, data_type="json", cookies=verify.get_cookies())
+    return resp
+
+
+def video_update_app(data: dict, verify: utils.Verify, access_key: str):
+    """
+    提交投稿信息
+    :param data: 投稿信息
+    {
+        "copyright": 1自制2转载,
+        "source": "类型为转载时注明来源",
+        "cover": "封面URL",
+        "desc": "简介",
+        "desc_format_id": 0,
+        "dynamic": "动态信息",
+        "interactive": 0,
+        "no_reprint": 1为显示禁止转载,
+        "subtitles": {
+            // 字幕格式，请自行研究
+            "lan": "语言",
+            "open": 0
+        },
+        "tag": "标签1,标签2,标签3（英文半角逗号分隔）",
+        "tid": 分区ID,
+        "title": "标题",
+        "videos": [
+            {
+                "desc": "描述",
+                "filename": "video_upload(返回值)",
+                "title": "分P标题"
+            }
+        ]
+    }
+    :param verify:
+    :return:
+    """
+    url = "https://member.bilibili.com/x/vu/app/edit/full"
+    payload = json.dumps(data, ensure_ascii=False).encode()
+    resp = post_with_app(url, get_method=False, data=payload, data_type="json", verify=verify, access_key=access_key)
     return resp
 
 
